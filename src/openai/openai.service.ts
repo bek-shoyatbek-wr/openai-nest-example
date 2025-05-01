@@ -18,10 +18,22 @@ export class OpenaiService {
   }
 
   async request(prompt: string) {
-    return await this.openAIClient.chat.completions.create({
+    const result = await this.openAIClient.chat.completions.create({
       model: OPEN_API_MODEL,
-      store: true,
-      messages: [{ role: 'assistant', content: prompt }],
+      messages: [
+        {
+          role: 'system',
+          content:
+            'You are a translation assistant. Translate the user\'s input and return only JSON format like: { "translated": "<translated text>" }',
+        },
+        {
+          role: 'user',
+          content: prompt,
+        },
+      ],
     });
+
+    const message = result.choices[0]?.message?.content ?? '';
+    return message;
   }
 }
